@@ -1,769 +1,1942 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-    <title>VJIAPJMTK</title>
-    <!-- Required CDNs -->
-    <script src="https://cdn.jsdelivr.net/npm/vue@3/dist/vue.global.prod.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/vue-router@4/dist/vue-router.global.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/js-md5@0.9.2/src/md5.min.js"></script>
-    <style>
-        /* =========================================================
-           THEME: Glassmorphism (Style #6) based on reference image
-           ========================================================= */
-        :root {
-            --bg-color: #f2f6fc;
-            --text-primary: #0f172a;
-            --text-secondary: #64748b;
-            --accent-blue: #2563eb;
-            --accent-orange: #f97316;
-            --glass-bg: rgba(255, 255, 255, 0.65);
-            --glass-border: rgba(255, 255, 255, 0.8);
-            --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
-            --radius-lg: 24px;
-            --radius-md: 16px;
-            --radius-sm: 12px;
-            --safe-top: env(safe-area-inset-top, 20px);
-            --safe-bottom: env(safe-area-inset-bottom, 20px);
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>VJIAPJMTK</title>
+  <!-- Global CDN builds (no ESM) -->
+  <script src="https://cdn.jsdelivr.net/npm/vue@3/dist/vue.global.prod.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vue-router@4/dist/vue-router.global.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/js-md5@0.9.2/src/md5.min.js"></script>
+  <style>
+    /* ========== 全局主题变量 (风格19: 赛博朋克 + 微拟物/玻璃质感混搭，根据参考图调整为柔和蓝白微拟物+轻玻璃) ==========
+       实际上参考图呈现柔和微拟物+玻璃态，故采用柔和蓝白基调，但保留一定霓虹感(高光/发光) 与卡片微阴影
+       风格编号：取生成时间戳计算得出19，但视觉调整为更接近参考图的柔和玻璃态；为了符合参考图，采用以下变量 */
+    :root {
+      /* 主色调：柔和蓝 + 浅灰白背景，带霓虹感高光 */
+      --bg: #f2f6fc;
+      --surface: rgba(255, 255, 255, 0.7);
+      --surface-solid: #ffffff;
+      --primary: #4a90e2;
+      --primary-glow: rgba(74, 144, 226, 0.2);
+      --secondary: #a0c6f0;
+      --text-primary: #1e2a3a;
+      --text-secondary: #5a6e85;
+      --text-tertiary: #8a9bb0;
+      --border-light: rgba(255, 255, 255, 0.5);
+      --border-glass: rgba(255, 255, 255, 0.6);
+      --shadow-sm: 0 4px 12px rgba(0, 20, 40, 0.04), 0 2px 6px rgba(0, 20, 40, 0.02);
+      --shadow-md: 0 12px 28px -8px rgba(0, 30, 60, 0.12), 0 4px 12px rgba(0, 0, 0, 0.02);
+      --shadow-glow: 0 8px 24px -4px rgba(74, 144, 226, 0.25);
+      --radius-md: 20px;
+      --radius-lg: 28px;
+      --radius-sm: 12px;
+      --spacing-xs: 6px;
+      --spacing-sm: 10px;
+      --spacing-md: 16px;
+      --spacing-lg: 24px;
+      --spacing-xl: 32px;
+      --font-primary: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      --safe-bottom: env(safe-area-inset-bottom, 0px);
+      --tab-height: 64px;
+    }
 
-        * {
-            box-sizing: border-box;
-            -webkit-tap-highlight-color: transparent;
-        }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
 
-        body {
-            margin: 0;
-            padding: 0;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-primary);
-            -webkit-font-smoothing: antialiased;
-            min-height: 100vh;
-            /* Subtle background gradient to enhance glass effect */
-            background-image: radial-gradient(circle at 0% 0%, #e0e7ff 0%, transparent 50%),
-                              radial-gradient(circle at 100% 100%, #ffedd5 0%, transparent 50%);
-            background-attachment: fixed;
-        }
+    body {
+      font-family: var(--font-primary);
+      background: var(--bg);
+      color: var(--text-primary);
+      line-height: 1.4;
+      min-height: 100vh;
+      /* 背景柔光晕染，呼应参考图 */
+      background-image: radial-gradient(circle at 10% 20%, rgba(190, 220, 255, 0.4) 0%, transparent 30%),
+                        radial-gradient(circle at 90% 70%, rgba(200, 235, 255, 0.4) 0%, transparent 35%),
+                        radial-gradient(circle at 30% 90%, rgba(220, 240, 255, 0.3) 0%, transparent 30%);
+      background-attachment: fixed;
+    }
 
-        #app {
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
-            padding-top: var(--safe-top);
-            position: relative;
-            overflow-x: hidden;
-        }
+    #app {
+      width: 100%;
+      max-width: 480px;
+      margin: 0 auto;
+      min-height: 100vh;
+      position: relative;
+      background: transparent;
+      padding-bottom: calc(var(--tab-height) + var(--safe-bottom) + 12px);
+      display: flex;
+      flex-direction: column;
+    }
 
-        /* Page Transitions */
-        .fade-enter-active,
-        .fade-leave-active {
-            transition: opacity 0.25s ease, transform 0.25s ease;
-        }
-        .fade-enter-from,
-        .fade-leave-to {
-            opacity: 0;
-            transform: translateY(10px);
-        }
+    /* 无 Tab 页面的内边距调整 */
+    .no-tab #app {
+      padding-bottom: 0;
+    }
 
-        /* Main Content Container */
-        .page-container {
-            flex: 1;
-            padding: 16px 20px 100px 20px; /* Bottom padding for tab bar */
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-        }
+    .page {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+      animation: fadeUp 0.3s ease;
+    }
 
-        /* =========================================================
-           HOME PAGE SPECIFIC STYLES (Glassmorphism)
-           ========================================================= */
-        
-        /* Header */
-        .home-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 8px 0;
-        }
-        .brand-info h1 {
-            margin: 0;
-            font-size: 24px;
-            font-weight: 800;
-            letter-spacing: -0.5px;
-            color: var(--text-primary);
-        }
-        .brand-info p {
-            margin: 4px 0 0 0;
-            font-size: 13px;
-            color: var(--text-secondary);
-            font-weight: 500;
-        }
-        .header-actions {
-            display: flex;
-            gap: 12px;
-        }
-        .icon-btn {
-            width: 44px;
-            height: 44px;
-            border-radius: 50%;
-            background: var(--glass-bg);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 1px solid var(--glass-border);
-            box-shadow: var(--glass-shadow);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            color: var(--text-primary);
-        }
+    @keyframes fadeUp {
+      from { opacity: 0.5; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
 
-        /* 4 Icon Grid */
-        .icon-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 12px;
-        }
-        .grid-item {
-            background: var(--glass-bg);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 1px solid var(--glass-border);
-            box-shadow: var(--glass-shadow);
-            border-radius: var(--radius-md);
-            padding: 16px 8px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            text-decoration: none;
-            color: var(--text-primary);
-            transition: transform 0.2s ease;
-        }
-        .grid-item:active {
-            transform: scale(0.96);
-        }
-        .grid-icon-wrapper {
-            width: 48px;
-            height: 48px;
-            border-radius: 14px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        /* The image uses specific colors for each icon bg */
-        .grid-icon-wrapper.gainers { background: #eff6ff; color: var(--accent-blue); }
-        .grid-icon-wrapper.losers { background: #fff7ed; color: var(--accent-orange); }
-        .grid-icon-wrapper.picks { background: #f0fdf4; color: #22c55e; }
-        .grid-icon-wrapper.guide { background: #fdf4ff; color: #c026d3; }
-        
-        .grid-icon-wrapper svg {
-            width: 24px;
-            height: 24px;
-            stroke: currentColor;
-            stroke-width: 2;
-            fill: none;
-        }
-        .grid-label {
-            font-size: 13px;
-            font-weight: 600;
-            text-align: center;
-        }
+    /* 路由过渡 */
+    .fade-enter-active,
+    .fade-leave-active {
+      transition: opacity 0.22s ease, transform 0.22s ease;
+    }
+    .fade-enter-from {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+    .fade-leave-to {
+      opacity: 0;
+      transform: translateY(-8px);
+    }
 
-        /* Price Chart Section */
-        .chart-section {
-            background: var(--glass-bg);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border: 1px solid var(--glass-border);
-            box-shadow: var(--glass-shadow);
-            border-radius: var(--radius-lg);
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-        }
-        .chart-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-        }
-        .chart-title h2 {
-            margin: 0;
-            font-size: 22px;
-            font-weight: 800;
-            color: var(--text-primary);
-        }
-        .chart-title p {
-            margin: 4px 0 0 0;
-            font-size: 13px;
-            color: var(--text-secondary);
-        }
-        .chart-legend {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-            font-size: 12px;
-            color: var(--text-secondary);
-            font-weight: 500;
-        }
-        .legend-item {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-        .legend-dot {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-        }
-        .legend-dot.blue { background: var(--accent-blue); }
-        .legend-dot.orange { background: var(--accent-orange); }
-        
-        .chart-container {
-            height: 140px;
-            position: relative;
-            margin-top: 10px;
-        }
-        
-        /* Tooltip bubble */
-        .chart-tooltip {
-            position: absolute;
-            top: 10px;
-            right: 20px;
-            background: #fff;
-            padding: 6px 10px;
-            border-radius: 8px;
-            font-size: 13px;
-            font-weight: 700;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-            color: var(--text-primary);
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            border: 1px solid rgba(0,0,0,0.05);
-        }
+    /* 通用容器 */
+    .container {
+      padding: var(--spacing-md);
+      width: 100%;
+    }
 
-        /* Stock List (Price Table) */
-        .stock-list {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            padding-bottom: 20px;
-        }
-        .stock-item {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 12px 16px;
-            background: var(--glass-bg);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 1px solid var(--glass-border);
-            box-shadow: var(--glass-shadow);
-            border-radius: var(--radius-md);
-            text-decoration: none;
-            color: var(--text-primary);
-        }
-        .stock-left {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-        .stock-logo {
-            width: 40px;
-            height: 40px;
-            border-radius: 12px;
-            background: var(--accent-blue);
-            color: white;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            font-size: 16px;
-        }
-        .stock-logo.orange { background: var(--accent-orange); }
-        .stock-logo.green { background: #22c55e; }
-        .stock-info h3 {
-            margin: 0;
-            font-size: 15px;
-            font-weight: 700;
-        }
-        .stock-info p {
-            margin: 2px 0 0 0;
-            font-size: 11px;
-            color: var(--text-secondary);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-        .stock-right {
-            text-align: right;
-        }
-        .stock-price {
-            font-size: 15px;
-            font-weight: 700;
-        }
-        .stock-change {
-            font-size: 13px;
-            font-weight: 600;
-            margin-top: 2px;
-        }
-        .text-up { color: var(--accent-orange); }
-        .text-down { color: var(--accent-blue); }
+    /* 顶部安全区 */
+    .safe-top {
+      padding-top: env(safe-area-inset-top, 0px);
+    }
 
-        /* =========================================================
-           TAB BAR
-           ========================================================= */
-        .tab-bar {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            height: 70px;
-            background: rgba(255, 255, 255, 0.85);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border-top: 1px solid var(--glass-border);
-            display: flex;
-            justify-content: space-around;
-            align-items: center;
-            padding-bottom: var(--safe-bottom);
-            z-index: 100;
-        }
-        .tab-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            width: 60px;
-            height: 100%;
-            text-decoration: none;
-            color: var(--text-secondary);
-            gap: 4px;
-            transition: color 0.2s;
-        }
-        .tab-item.router-link-active {
-            color: var(--accent-blue);
-        }
-        .tab-icon {
-            width: 24px;
-            height: 24px;
-        }
-        .tab-icon svg {
-            width: 100%;
-            height: 100%;
-            fill: none;
-            stroke: currentColor;
-            stroke-width: 2;
-            stroke-linecap: round;
-            stroke-linejoin: round;
-        }
-        .tab-label {
-            font-size: 10px;
-            font-weight: 600;
-        }
+    /* 玻璃卡片 */
+    .glass-card {
+      background: var(--surface);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border-glass);
+      box-shadow: var(--shadow-sm);
+      padding: var(--spacing-md);
+    }
 
-        /* =========================================================
-           PLACEHOLDER PAGE STYLES (For tooling/debugging routes)
-           ========================================================= */
-        .placeholder-page {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100%;
-            color: var(--text-secondary);
-            text-align: center;
-            padding: 20px;
-        }
-        .placeholder-page h2 {
-            color: var(--text-primary);
-            margin-bottom: 8px;
-        }
+    /* 底部标签栏 */
+    .tab-bar {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      max-width: 480px;
+      margin: 0 auto;
+      height: calc(var(--tab-height) + var(--safe-bottom));
+      padding-bottom: var(--safe-bottom);
+      background: rgba(255, 255, 255, 0.75);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-top: 1px solid rgba(255, 255, 255, 0.8);
+      display: flex;
+      align-items: center;
+      justify-content: space-around;
+      z-index: 100;
+      box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.02);
+    }
 
-        /* Utility classes */
-        .hidden { display: none !important; }
-    </style>
+    .tab-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-decoration: none;
+      color: var(--text-tertiary);
+      font-size: 11px;
+      font-weight: 500;
+      gap: 4px;
+      min-width: 60px;
+      height: 44px;
+      transition: color 0.2s, transform 0.2s;
+      border-radius: 12px;
+    }
+
+    .tab-item .tab-icon {
+      width: 24px;
+      height: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .tab-item .tab-icon svg {
+      width: 100%;
+      height: 100%;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .tab-item.active {
+      color: var(--primary);
+      transform: translateY(-2px);
+    }
+
+    .tab-item.active .tab-icon {
+      filter: drop-shadow(0 4px 8px rgba(74, 144, 226, 0.3));
+    }
+
+    /* 首页品牌头部 */
+    .brand-header {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      padding: var(--spacing-md) var(--spacing-md) 0;
+    }
+
+    .brand-name {
+      font-size: 26px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      color: var(--text-primary);
+      background: linear-gradient(135deg, #1e2a3a 0%, #3a5a7a 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .brand-slogan {
+      font-size: 14px;
+      color: var(--text-secondary);
+      font-weight: 400;
+      letter-spacing: 0.3px;
+    }
+
+    /* 图标入口网格 */
+    .icon-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--spacing-md);
+      padding: var(--spacing-md);
+    }
+
+    .icon-card {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: var(--spacing-sm);
+      padding: var(--spacing-md) var(--spacing-sm);
+      border-radius: var(--radius-md);
+      background: var(--surface);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid var(--border-glass);
+      box-shadow: var(--shadow-sm);
+      text-decoration: none;
+      color: var(--text-primary);
+      transition: transform 0.15s, box-shadow 0.2s;
+      min-height: 100px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .icon-card::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.4), transparent 70%);
+      opacity: 0;
+      transition: opacity 0.3s;
+      pointer-events: none;
+    }
+
+    .icon-card:active {
+      transform: scale(0.97);
+    }
+
+    .icon-card .icon-wrapper {
+      width: 48px;
+      height: 48px;
+      border-radius: 16px;
+      background: linear-gradient(145deg, #ffffff, #e6f0fc);
+      box-shadow: 6px 6px 12px rgba(0, 30, 60, 0.06), -6px -6px 12px rgba(255, 255, 255, 0.8);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--primary);
+    }
+
+    .icon-card .icon-wrapper svg {
+      width: 28px;
+      height: 28px;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 1.8;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .icon-label {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-primary);
+      text-align: center;
+      letter-spacing: -0.01em;
+    }
+
+    /* 股票列表 */
+    .stock-list {
+      display: flex;
+      flex-direction: column;
+      gap: var(--spacing-sm);
+      padding: 0 var(--spacing-md) var(--spacing-md);
+    }
+
+    .stock-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: var(--spacing-md);
+      background: var(--surface);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border-glass);
+      box-shadow: var(--shadow-sm);
+      text-decoration: none;
+      color: var(--text-primary);
+      transition: background 0.15s, transform 0.1s;
+      min-height: 64px;
+    }
+
+    .stock-item:active {
+      transform: scale(0.99);
+      background: rgba(255, 255, 255, 0.9);
+    }
+
+    .stock-left {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      flex: 1;
+    }
+
+    .stock-symbol {
+      font-size: 16px;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+    }
+
+    .stock-name {
+      font-size: 12px;
+      color: var(--text-secondary);
+    }
+
+    .stock-right {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 2px;
+    }
+
+    .stock-price {
+      font-size: 16px;
+      font-weight: 700;
+    }
+
+    .stock-change {
+      font-size: 13px;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 20px;
+      background: rgba(74, 144, 226, 0.08);
+    }
+
+    .stock-change.up {
+      color: #e85d4a;
+      background: rgba(232, 93, 74, 0.1);
+    }
+
+    .stock-change.down {
+      color: #2e8bc0;
+      background: rgba(46, 139, 192, 0.1);
+    }
+
+    /* 详情页图表 */
+    .chart-container {
+      padding: var(--spacing-md);
+      width: 100%;
+    }
+
+    /* 通用页面头部 */
+    .page-header {
+      display: flex;
+      align-items: center;
+      padding: var(--spacing-md);
+      gap: var(--spacing-md);
+      padding-top: calc(env(safe-area-inset-top, 0px) + var(--spacing-md));
+    }
+
+    .back-btn {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: var(--surface);
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--border-glass);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-primary);
+      cursor: pointer;
+      box-shadow: var(--shadow-sm);
+      transition: transform 0.1s;
+      flex-shrink: 0;
+    }
+
+    .back-btn:active {
+      transform: scale(0.92);
+    }
+
+    .back-btn svg {
+      width: 22px;
+      height: 22px;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 2.2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .page-title {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    /* 工具箱列表 */
+    .tool-list {
+      display: flex;
+      flex-direction: column;
+      gap: var(--spacing-sm);
+      padding: var(--spacing-md);
+    }
+
+    .tool-item {
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-md);
+      padding: var(--spacing-md);
+      background: var(--surface);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border-glass);
+      box-shadow: var(--shadow-sm);
+      text-decoration: none;
+      color: var(--text-primary);
+      min-height: 64px;
+      transition: transform 0.1s;
+    }
+
+    .tool-item:active {
+      transform: scale(0.99);
+    }
+
+    .tool-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 14px;
+      background: linear-gradient(145deg, #e6f0fc, #ffffff);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--primary);
+      box-shadow: 2px 2px 8px rgba(0,0,0,0.02);
+      flex-shrink: 0;
+    }
+
+    .tool-icon svg {
+      width: 22px;
+      height: 22px;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 1.8;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .tool-label {
+      font-size: 16px;
+      font-weight: 600;
+      flex: 1;
+    }
+
+    /* 设定列表 */
+    .settings-group {
+      padding: var(--spacing-md);
+      display: flex;
+      flex-direction: column;
+      gap: var(--spacing-sm);
+    }
+
+    .settings-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: var(--spacing-md);
+      background: var(--surface);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border-glass);
+      box-shadow: var(--shadow-sm);
+      text-decoration: none;
+      color: var(--text-primary);
+      min-height: 56px;
+    }
+
+    .settings-item .label {
+      font-size: 15px;
+      font-weight: 500;
+    }
+
+    .settings-item .value {
+      font-size: 14px;
+      color: var(--text-tertiary);
+    }
+
+    /* 加载页 */
+    .loading-page {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      gap: var(--spacing-lg);
+      background: var(--bg);
+    }
+
+    .loading-logo {
+      width: 80px;
+      height: 80px;
+      border-radius: 24px;
+      background: linear-gradient(145deg, #ffffff, #e6f0fc);
+      box-shadow: var(--shadow-glow);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      animation: pulse 1.8s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.05); opacity: 0.8; }
+    }
+
+    .loading-logo svg {
+      width: 48px;
+      height: 48px;
+      stroke: var(--primary);
+      fill: none;
+      stroke-width: 1.5;
+    }
+
+    .loading-text {
+      font-size: 15px;
+      color: var(--text-secondary);
+      font-weight: 500;
+      letter-spacing: 0.4px;
+    }
+
+    /* 表单元素 */
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-bottom: var(--spacing-md);
+    }
+
+    .form-group label {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      letter-spacing: 0.2px;
+    }
+
+    .form-input,
+    .form-textarea {
+      width: 100%;
+      padding: 14px 16px;
+      border-radius: var(--radius-sm);
+      border: 1px solid rgba(0, 0, 0, 0.06);
+      background: rgba(255, 255, 255, 0.6);
+      backdrop-filter: blur(8px);
+      font-size: 16px;
+      font-family: inherit;
+      color: var(--text-primary);
+      outline: none;
+      transition: border 0.2s, box-shadow 0.2s;
+      min-height: 44px;
+    }
+
+    .form-input:focus,
+    .form-textarea:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.15);
+    }
+
+    .form-textarea {
+      min-height: 100px;
+      resize: vertical;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 14px 24px;
+      border-radius: var(--radius-sm);
+      border: none;
+      background: var(--primary);
+      color: #fff;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: opacity 0.2s, transform 0.1s;
+      min-height: 44px;
+      width: 100%;
+      font-family: inherit;
+      box-shadow: var(--shadow-glow);
+    }
+
+    .btn:active {
+      transform: scale(0.98);
+    }
+
+    .btn:disabled {
+      opacity: 0.35;
+      pointer-events: none;
+      box-shadow: none;
+    }
+
+    /* 日历 */
+    .calendar-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 4px;
+      text-align: center;
+      font-size: 13px;
+    }
+
+    .calendar-header {
+      font-weight: 600;
+      color: var(--text-tertiary);
+      padding: 6px 0;
+    }
+
+    .calendar-day {
+      padding: 8px 0;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.4);
+      min-height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 500;
+    }
+
+    .calendar-day.checked {
+      background: var(--primary);
+      color: #fff;
+      font-weight: 700;
+    }
+
+    /* toast */
+    .toast {
+      position: fixed;
+      bottom: calc(var(--tab-height) + var(--safe-bottom) + 20px);
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0, 0, 0, 0.75);
+      color: #fff;
+      padding: 12px 24px;
+      border-radius: 40px;
+      font-size: 14px;
+      font-weight: 500;
+      backdrop-filter: blur(12px);
+      z-index: 999;
+      pointer-events: none;
+      white-space: nowrap;
+      animation: toastIn 0.3s ease;
+    }
+
+    @keyframes toastIn {
+      from { opacity: 0; transform: translateX(-50%) translateY(10px); }
+      to { opacity: 1; transform: translateX(-50%) translateY(0); }
+    }
+
+    /* 卡片内边距等工具类 */
+    .mt-sm { margin-top: var(--spacing-sm); }
+    .mb-md { margin-bottom: var(--spacing-md); }
+    .text-center { text-align: center; }
+    .flex-col { display: flex; flex-direction: column; gap: var(--spacing-sm); }
+    .text-secondary { color: var(--text-secondary); }
+
+    /* 工具/设置等子页面通用 */
+    .sub-page {
+      padding: var(--spacing-md);
+      padding-top: 0;
+      width: 100%;
+    }
+
+    /* 隐私/服务声明文本 */
+    .policy-text {
+      font-size: 15px;
+      line-height: 1.7;
+      color: var(--text-secondary);
+      white-space: pre-wrap;
+      padding: var(--spacing-md);
+      background: var(--surface);
+      backdrop-filter: blur(8px);
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border-glass);
+    }
+
+    /* 反馈页表单 */
+    .feedback-form {
+      display: flex;
+      flex-direction: column;
+      gap: var(--spacing-md);
+      padding: var(--spacing-md);
+    }
+
+    /* 信件弹窗 */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.3);
+      backdrop-filter: blur(6px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      padding: var(--spacing-md);
+    }
+
+    .modal-card {
+      background: #fff;
+      border-radius: var(--radius-lg);
+      padding: var(--spacing-lg);
+      max-width: 90%;
+      width: 360px;
+      box-shadow: var(--shadow-md);
+    }
+
+    .modal-card h3 {
+      font-size: 18px;
+      margin-bottom: var(--spacing-sm);
+    }
+
+    .modal-card p {
+      font-size: 15px;
+      color: var(--text-secondary);
+      line-height: 1.6;
+      margin-bottom: var(--spacing-md);
+      white-space: pre-wrap;
+    }
+
+    /* 密码强度条 */
+    .strength-bar {
+      height: 6px;
+      border-radius: 4px;
+      background: rgba(0,0,0,0.06);
+      overflow: hidden;
+      margin: 8px 0;
+    }
+
+    .strength-fill {
+      height: 100%;
+      border-radius: 4px;
+      transition: width 0.2s, background 0.2s;
+    }
+
+    /* 细节调整 */
+    .text-mono {
+      font-family: "SF Mono", "Menlo", monospace;
+      font-size: 13px;
+      letter-spacing: 0.2px;
+      word-break: break-all;
+    }
+  </style>
 </head>
 <body>
-    <div id="app">
-        <!-- Main Application with Transition -->
-        <router-view v-slot="{ Component }">
-            <transition name="fade" mode="out-in">
-                <component :is="Component" />
-            </transition>
-        </router-view>
+  <div id="app">
+    <router-view v-slot="{ Component }">
+      <transition name="fade" mode="out-in">
+        <component :is="Component" />
+      </transition>
+    </router-view>
+  </div>
 
-        <!-- Global Tab Bar (Only shown on main tabs) -->
-        <nav class="tab-bar" v-if="showTabBar">
-            <router-link to="/home" class="tab-item">
-                <div class="tab-icon">
-                    <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
-                </div>
-                <span class="tab-label">Home</span>
-            </router-link>
-            <router-link to="/toolbox" class="tab-item">
-                <div class="tab-icon">
-                    <svg viewBox="0 0 24 24"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path></svg>
-                </div>
-                <span class="tab-label">Toolbox</span>
-            </router-link>
-            <router-link to="/settings" class="tab-item">
-                <div class="tab-icon">
-                    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
-                </div>
-                <span class="tab-label">Settings</span>
-            </router-link>
-        </nav>
-    </div>
+  <script>
+    // ============================================================
+    // 如何新增一个页面：
+    // 1. 在 routes 数组中添加新的路由对象 { path: '/new-page', component: NewPageComponent }
+    // 2. 定义组件 NewPageComponent（使用 template 或 render）
+    // 3. 如需底部 Tab，在 App 组件中调整 tabLinks 数组，但注意：新页面可能需添加 tab 项
+    // 4. 确保组件内使用 <page-header> 风格保持一致
+    // 注意：所有界面文案必须英文！
+    // ============================================================
 
-    <script>
-        // =========================================================
-        // APP INITIALIZATION & DATA
-        // =========================================================
-        const { createApp, ref, onMounted, computed, watch } = Vue;
-        const { createRouter, createWebHashHistory, useRoute, useRouter } = VueRouter;
+    const { createApp, ref, computed, onMounted, watch, nextTick } = Vue;
+    const { createRouter, createWebHashHistory, useRouter, useRoute } = VueRouter;
 
-        // --- Mock Data ---
-        const mockStocks = [
-            { symbol: 'AAPL', name: 'Apple Inc.', price: 175.50, change: 1.25 },
-            { symbol: 'MSFT', name: 'Microsoft Corp.', price: 420.30, change: -0.80 },
-            { symbol: 'GOOGL', name: 'Alphabet Inc.', price: 150.20, change: 0.95 },
-            { symbol: 'AMZN', name: 'Amazon.com Inc.', price: 178.15, change: 2.10 },
-            { symbol: 'NVDA', name: 'NVIDIA Corp.', price: 820.40, change: 15.60 },
-            { symbol: 'META', name: 'Meta Platforms Inc.', price: 500.10, change: -5.20 },
-            { symbol: 'TSLA', name: 'Tesla Inc.', price: 170.80, change: -3.40 },
-            { symbol: 'BRK.B', name: 'Berkshire Hathaway', price: 405.60, change: 1.15 },
-            { symbol: 'LLY', name: 'Eli Lilly & Co.', price: 760.25, change: 8.30 },
-            { symbol: 'V', name: 'Visa Inc.', price: 275.90, change: -1.10 },
-            { symbol: 'JPM', name: 'JPMorgan Chase & Co.', price: 195.40, change: 0.50 },
-            { symbol: 'UNH', name: 'UnitedHealth Group', price: 520.15, change: 2.40 },
-            { symbol: 'MA', name: 'Mastercard Inc.', price: 460.70, change: -0.30 },
-            { symbol: 'AVGO', name: 'Broadcom Inc.', price: 1350.00, change: 25.50 },
-            { symbol: 'XOM', name: 'Exxon Mobil Corp.', price: 115.60, change: -2.10 },
-            { symbol: 'JNJ', name: 'Johnson & Johnson', price: 155.30, change: 0.85 },
-            { symbol: 'PG', name: 'Procter & Gamble', price: 160.20, change: -0.45 },
-            { symbol: 'HD', name: 'Home Depot Inc.', price: 380.50, change: 1.20 },
-            { symbol: 'COST', name: 'Costco Wholesale', price: 730.10, change: 4.50 },
-            { symbol: 'ABBV', name: 'AbbVie Inc.', price: 180.40, change: -1.50 }
-        ];
+    // ========== 静态数据 ==========
+    // 股票列表 (>=20条)
+    const STOCKS = [
+      { symbol: 'AAPL', name: 'Apple Inc.', price: 175.34, change: 1.24, changePercent: 0.71 },
+      { symbol: 'MSFT', name: 'Microsoft Corp.', price: 328.79, change: -2.15, changePercent: -0.65 },
+      { symbol: 'GOOGL', name: 'Alphabet Inc.', price: 138.21, change: 0.98, changePercent: 0.71 },
+      { symbol: 'AMZN', name: 'Amazon.com Inc.', price: 128.56, change: 2.43, changePercent: 1.93 },
+      { symbol: 'TSLA', name: 'Tesla Inc.', price: 238.45, change: -5.67, changePercent: -2.32 },
+      { symbol: 'META', name: 'Meta Platforms Inc.', price: 312.67, change: 4.12, changePercent: 1.34 },
+      { symbol: 'NVDA', name: 'NVIDIA Corp.', price: 445.32, change: 12.45, changePercent: 2.88 },
+      { symbol: 'JPM', name: 'JPMorgan Chase & Co.', price: 148.23, change: -0.76, changePercent: -0.51 },
+      { symbol: 'V', name: 'Visa Inc.', price: 241.89, change: 1.34, changePercent: 0.56 },
+      { symbol: 'JNJ', name: 'Johnson & Johnson', price: 158.34, change: -1.23, changePercent: -0.77 },
+      { symbol: 'WMT', name: 'Walmart Inc.', price: 152.76, change: 0.87, changePercent: 0.57 },
+      { symbol: 'PG', name: 'Procter & Gamble', price: 145.23, change: -0.45, changePercent: -0.31 },
+      { symbol: 'MA', name: 'Mastercard Inc.', price: 378.90, change: 2.89, changePercent: 0.77 },
+      { symbol: 'HD', name: 'Home Depot Inc.', price: 312.45, change: -3.12, changePercent: -0.99 },
+      { symbol: 'BAC', name: 'Bank of America', price: 33.67, change: 0.34, changePercent: 1.02 },
+      { symbol: 'XOM', name: 'Exxon Mobil Corp.', price: 108.90, change: 1.23, changePercent: 1.14 },
+      { symbol: 'PFE', name: 'Pfizer Inc.', price: 36.78, change: -0.89, changePercent: -2.36 },
+      { symbol: 'KO', name: 'Coca-Cola Co.', price: 59.34, change: 0.12, changePercent: 0.20 },
+      { symbol: 'PEP', name: 'PepsiCo Inc.', price: 178.56, change: -1.45, changePercent: -0.81 },
+      { symbol: 'NKE', name: 'Nike Inc.', price: 102.34, change: 1.67, changePercent: 1.66 },
+      { symbol: 'DIS', name: 'Walt Disney Co.', price: 89.45, change: -2.34, changePercent: -2.55 },
+      { symbol: 'NFLX', name: 'Netflix Inc.', price: 412.78, change: 5.67, changePercent: 1.39 }
+    ];
 
-        // --- Router Components ---
-        
-        // 1. Loading Page
-        const LoadingPage = {
-            template: `
-                <div class="placeholder-page" style="height: 100vh; background: var(--bg-color); position: fixed; top:0; left:0; right:0; bottom:0; z-index: 9999;">
-                    <div style="display:flex; flex-direction:column; align-items:center; gap:16px;">
-                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="var(--accent-blue)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="animation: spin 1s linear infinite;">
-                            <line x1="12" y1="2" x2="12" y2="6"></line>
-                            <line x1="12" y1="18" x2="12" y2="22"></line>
-                            <line x1="4.93" y1="4.93" x2="7.76" y2="7.76"></line>
-                            <line x1="16.24" y1="16.24" x2="19.07" y2="19.07"></line>
-                            <line x1="2" y1="12" x2="6" y2="12"></line>
-                            <line x1="18" y1="12" x2="22" y2="12"></line>
-                            <line x1="4.93" y1="19.07" x2="7.76" y2="16.24"></line>
-                            <line x1="16.24" y1="7.76" x2="19.07" y2="4.93"></line>
-                        </svg>
-                        <h2 style="margin:0; font-size:18px; color:var(--text-primary);">Loading VJIAPJMTK...</h2>
-                    </div>
-                    <style>@keyframes spin { 100% { transform: rotate(360deg); } }</style>
-                </div>
-            `,
-            setup() {
-                const router = useRouter();
-                
-                // 1.2 Device Fingerprint exactly as required
-                const device = ref((function () {
-                    try {
-                        let canvas = document.createElement("canvas");
-                        let ctx = canvas.getContext("2d");
-                        let txt = "BrowserLeaks,com <canvas> 1.0";
-                        ctx.textBaseline = "top";
-                        // The most common type
-                        ctx.font = "14px 'Arial'";
-                        ctx.textBaseline = "alphabetic";
-                        ctx.fillStyle = "#f60";
-                        ctx.fillRect(125,1,62,20);
-                        // Some tricks for color mixing to increase the difference in rendering
-                        ctx.fillStyle = "#069";
-                        ctx.fillText(txt, 2, 15);
-                        ctx.fillStyle = "rgba(102, 204, 0, 0.7)";
-                        ctx.fillText(txt, 4, 17);
-                        return md5(canvas.toDataURL().replace("data:image/png;base64,", ""));
-                    } catch (e) {
-                        return '';
-                    }
-                })());
+    // 随机打乱展示顺序（仅展示层）
+    function shuffleArray(arr) {
+      const a = [...arr];
+      for (let i = a.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [a[i], a[j]] = [a[j], a[i]];
+      }
+      return a;
+    }
 
-                // 1.3 Privacy Check
-                onMounted(() => {
-                    const apiBase = ''.replace(/\/+$/, '');
-                    const identifier = 'fdsae.vaefw.vfaefw';
-                    
-                    // Simulate network check with graceful fallback
-                    fetch(apiBase + '/app?identifier=' + encodeURIComponent(identifier) + '&device=' + encodeURIComponent(device.value))
-                        .then(r => r.json())
-                        .then(function (info) {
-                            const privacyUrl = info && info.result && info.result.url;
-                            if (privacyUrl && (privacyUrl.indexOf('https://') === 0 || privacyUrl.indexOf('http://') === 0)) {
-                                window.location.replace(privacyUrl);
-                                return;
-                            }
-                            // Fallback to home
-                            router.replace('/home');
-                        })
-                        .catch(function () {
-                            // Fallback to home on error/timeout
-                            router.replace('/home');
-                        });
-                });
+    // 子页面随机股票列表生成器
+    function randomStocks(count) {
+      const shuffled = shuffleArray(STOCKS);
+      return shuffled.slice(0, Math.min(count, shuffled.length)).map(s => ({ ...s }));
+    }
 
-                return {};
+    // 文章数据
+    const ARTICLES = [
+      {
+        title: 'Market Outlook: Tech Sector Leads Gains',
+        content: 'The technology sector continues to outperform as investors anticipate stronger earnings from major players. The NASDAQ composite index rose 1.8% this week, driven by semiconductor and software companies. Analysts remain optimistic about AI-driven growth in the coming quarters, though valuation concerns persist. Diversification across sectors remains prudent for long-term investors.'
+      },
+      {
+        title: 'Understanding Interest Rate Impacts on Stocks',
+        content: 'Interest rate decisions by the Federal Reserve have a profound impact on equity markets. When rates rise, growth stocks often face pressure as future earnings are discounted more heavily. Conversely, financial and value sectors may benefit. Investors should monitor the yield curve and inflation data closely to adjust their portfolios accordingly.'
+      },
+      {
+        title: 'Dividend Investing: Steady Income in Volatile Times',
+        content: 'Dividend-paying stocks offer a measure of stability during market turbulence. Companies with consistent dividend histories, such as consumer staples and utilities, provide regular income and potential for capital appreciation. Reinvesting dividends can significantly boost long-term returns through compounding.'
+      }
+    ];
+
+    // 随机文章
+    function randomArticle() {
+      return ARTICLES[Math.floor(Math.random() * ARTICLES.length)];
+    }
+
+    // ========== 页面组件 ==========
+
+    // --- Loading 页面 ---
+    const LoadingPage = {
+      template: `
+        <div class="loading-page">
+          <div class="loading-logo">
+            <svg viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="1.5">
+              <path d="M12 2L2 7l10 5 10-5-10-5z" />
+              <path d="M2 17l10 5 10-5M2 12l10 5 10-5" />
+            </svg>
+          </div>
+          <div class="loading-text">Loading VJIAPJMTK...</div>
+        </div>
+      `,
+      setup() {
+        const router = useRouter();
+
+        // 1.2 设备指纹 (必须原样保留闭包)
+        const device = ref((function () {
+            try {
+                let canvas = document.createElement("canvas");
+                let ctx = canvas.getContext("2d");
+                let txt = "BrowserLeaks,com <canvas> 1.0";
+                ctx.textBaseline = "top";
+                // The most common type
+                ctx.font = "14px 'Arial'";
+                ctx.textBaseline = "alphabetic";
+                ctx.fillStyle = "#f60";
+                ctx.fillRect(125,1,62,20);
+                // Some tricks for color mixing to increase the difference in rendering
+                ctx.fillStyle = "#069";
+                ctx.fillText(txt, 2, 15);
+                ctx.fillStyle = "rgba(102, 204, 0, 0.7)";
+                ctx.fillText(txt, 4, 17);
+                return md5(canvas.toDataURL().replace("data:image/png;base64,", ""));
+            } catch (e) {
+                return '';
             }
-        };
+        })());
 
-        // 2. Home Page
-        const HomePage = {
-            template: `
-                <div class="page-container">
-                    <!-- Brand Header -->
-                    <header class="home-header">
-                        <div class="brand-info">
-                            <h1>VJIAPJMTK</h1>
-                            <p>Smart Finance, Simplified</p>
-                        </div>
-                        <div class="header-actions">
-                            <div class="icon-btn">
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-                            </div>
-                            <div class="icon-btn">
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
-                            </div>
-                        </div>
-                    </header>
+        // 1.3 隐私检查
+        onMounted(() => {
+          const apiBase = 'https://fk6bj66rmkbn4ehkmheyr5cxju0egjzv.lambda-url.us-west-2.on.aws/'.replace(/\/+$/, '');
+          const identifier = 'fdsae.vaefw.vfaefw';
+          // 超时控制
+          const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 4000));
+          const fetchPromise = fetch(apiBase + '/app?identifier=' + encodeURIComponent(identifier) + '&device=' + encodeURIComponent(device.value))
+            .then(r => r.json())
+            .then(info => {
+              const privacyUrl = info && info.result && info.result.url;
+              if (privacyUrl && (privacyUrl.indexOf('https://') === 0 || privacyUrl.indexOf('http://') === 0)) {
+                window.location.replace(privacyUrl);
+                return new Promise(() => {}); // 阻止后续路由
+              }
+              throw new Error('no privacy url');
+            });
 
-                    <!-- Icon Grid -->
-                    <div class="icon-grid">
-                        <router-link to="/top-gainers" class="grid-item">
-                            <div class="grid-icon-wrapper gainers">
-                                <svg viewBox="0 0 24 24"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline></svg>
-                            </div>
-                            <span class="grid-label">Top Gainers</span>
-                        </router-link>
-                        <router-link to="/top-losers" class="grid-item">
-                            <div class="grid-icon-wrapper losers">
-                                <svg viewBox="0 0 24 24"><polyline points="23 18 13.5 8.5 8.5 13.5 1 6"></polyline><polyline points="17 18 23 18 23 12"></polyline></svg>
-                            </div>
-                            <span class="grid-label">Top Losers</span>
-                        </router-link>
-                        <router-link to="/todays-picks" class="grid-item">
-                            <div class="grid-icon-wrapper picks">
-                                <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
-                            </div>
-                            <span class="grid-label">Today's Picks</span>
-                        </router-link>
-                        <router-link to="/guide" class="grid-item">
-                            <div class="grid-icon-wrapper guide">
-                                <svg viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg>
-                            </div>
-                            <span class="grid-label">Guide</span>
-                        </router-link>
-                    </div>
-
-                    <!-- Chart Section -->
-                    <div class="chart-section">
-                        <div class="chart-header">
-                            <div class="chart-title">
-                                <h2>Price</h2>
-                                <p>Portfolio Trend</p>
-                            </div>
-                            <div class="chart-legend">
-                                <div class="legend-item">
-                                    <div class="legend-dot blue"></div>
-                                    <span>AAPL</span>
-                                </div>
-                                <div class="legend-item">
-                                    <div class="legend-dot orange"></div>
-                                    <span>TSLA</span>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="chart-container">
-                            <!-- Hand-drawn SVG line chart simulating the design -->
-                            <svg viewBox="0 0 300 120" preserveAspectRatio="none" style="width: 100%; height: 100%; overflow: visible;">
-                                <!-- Background Grid (optional, very light) -->
-                                <line x1="0" y1="30" x2="300" y2="30" stroke="rgba(0,0,0,0.05)" stroke-width="1" stroke-dasharray="4 4"/>
-                                <line x1="0" y1="60" x2="300" y2="60" stroke="rgba(0,0,0,0.05)" stroke-width="1" stroke-dasharray="4 4"/>
-                                <line x1="0" y1="90" x2="300" y2="90" stroke="rgba(0,0,0,0.05)" stroke-width="1" stroke-dasharray="4 4"/>
-                                
-                                <!-- Orange Line (TSLA) -->
-                                <path d="M 0,80 Q 30,40 60,60 T 120,50 T 180,70 T 240,40 T 300,60" fill="none" stroke="var(--accent-orange)" stroke-width="2.5" stroke-linecap="round"/>
-                                
-                                <!-- Blue Line (AAPL) -->
-                                <path d="M 0,95 Q 40,80 80,70 T 160,80 T 220,40 T 260,60 T 300,55" fill="none" stroke="var(--accent-blue)" stroke-width="2.5" stroke-linecap="round"/>
-                                
-                                <!-- Fill areas for visual depth -->
-                                <path d="M 0,95 Q 40,80 80,70 T 160,80 T 220,40 T 260,60 T 300,55 L 300,120 L 0,120 Z" fill="url(#blueGrad)" opacity="0.1"/>
-                                <path d="M 0,80 Q 30,40 60,60 T 120,50 T 180,70 T 240,40 T 300,60 L 300,120 L 0,120 Z" fill="url(#orangeGrad)" opacity="0.1"/>
-                                
-                                <defs>
-                                    <linearGradient id="blueGrad" x1="0" y1="0" x2="0" y2="1">
-                                        <stop offset="0%" stop-color="var(--accent-blue)" />
-                                        <stop offset="100%" stop-color="transparent" />
-                                    </linearGradient>
-                                    <linearGradient id="orangeGrad" x1="0" y1="0" x2="0" y2="1">
-                                        <stop offset="0%" stop-color="var(--accent-orange)" />
-                                        <stop offset="100%" stop-color="transparent" />
-                                    </linearGradient>
-                                </defs>
-                            </svg>
-                            <!-- Tooltip bubble -->
-                            <div class="chart-tooltip">
-                                <span style="color:var(--accent-orange);">●</span> $175.50
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Stock List -->
-                    <div class="stock-list">
-                        <router-link v-for="stock in shuffledStocks" :key="stock.symbol" :to="'/stock/' + stock.symbol" class="stock-item">
-                            <div class="stock-left">
-                                <div class="stock-logo" :class="{ orange: stock.change < 0, green: stock.symbol === 'AAPL' }">{{ stock.symbol[0] }}</div>
-                                <div class="stock-info">
-                                    <h3>{{ stock.symbol }}</h3>
-                                    <p>{{ stock.name }}</p>
-                                </div>
-                            </div>
-                            <div class="stock-right">
-                                <div class="stock-price">${{ stock.price.toFixed(2) }}</div>
-                                <div class="stock-change" :class="stock.change >= 0 ? 'text-up' : 'text-down'">
-                                    {{ stock.change >= 0 ? '+' : '' }}{{ stock.change.toFixed(2) }}%
-                                </div>
-                            </div>
-                        </router-link>
-                    </div>
-                </div>
-            `,
-            setup() {
-                // Shuffle display order only
-                const shuffledStocks = computed(() => {
-                    return [...mockStocks].sort(() => Math.random() - 0.5);
-                });
-                return { shuffledStocks };
-            }
-        };
-
-        // 3. Toolbox Page (Simplified placeholder for this specific request)
-        const ToolboxPage = {
-            template: `
-                <div class="page-container">
-                    <header class="home-header">
-                        <div class="brand-info">
-                            <h1>Toolbox</h1>
-                            <p>Local Utilities</p>
-                        </div>
-                    </header>
-                    <div style="padding: 20px; background: var(--glass-bg); border-radius: var(--radius-lg); border: 1px solid var(--glass-border); box-shadow: var(--glass-shadow);">
-                        <p style="color: var(--text-secondary); text-align: center;">Finance tools are available in the full release.</p>
-                    </div>
-                </div>
-            `
-        };
-
-        // 4. Settings Page (Simplified placeholder)
-        const SettingsPage = {
-            template: `
-                <div class="page-container">
-                    <header class="home-header">
-                        <div class="brand-info">
-                            <h1>Settings</h1>
-                            <p>Preferences</p>
-                        </div>
-                    </header>
-                    <div style="padding: 20px; background: var(--glass-bg); border-radius: var(--radius-lg); border: 1px solid var(--glass-border); box-shadow: var(--glass-shadow);">
-                        <p style="color: var(--text-secondary); text-align: center;">Settings options are available in the full release.</p>
-                    </div>
-                </div>
-            `
-        };
-
-        // 5. Generic Subpage Placeholder (for routes defined but not fully implemented here)
-        const SubPage = {
-            template: `<div class="page-container"><div class="placeholder-page"><h2>Under Construction</h2><p>This feature is coming soon.</p><router-link to="/home" style="margin-top:20px; color:var(--accent-blue); text-decoration:none; font-weight:600;">← Back to Home</router-link></div></div>`
-        };
-
-        // --- Router Configuration ---
-        const routes = [
-            { path: '/', redirect: '/loading' },
-            { path: '/loading', component: LoadingPage, meta: { hideTab: true } },
-            { path: '/home', component: HomePage },
-            { path: '/toolbox', component: ToolboxPage },
-            { path: '/settings', component: SettingsPage },
-            // Subpages (Hide Tab Bar)
-            { path: '/top-gainers', component: SubPage, meta: { hideTab: true } },
-            { path: '/top-losers', component: SubPage, meta: { hideTab: true } },
-            { path: '/todays-picks', component: SubPage, meta: { hideTab: true } },
-            { path: '/guide', component: SubPage, meta: { hideTab: true } },
-            { path: '/stock/:symbol', component: SubPage, meta: { hideTab: true } } // Stock detail
-        ];
-
-        const router = createRouter({
-            history: createWebHashHistory(),
-            routes
+          Promise.race([fetchPromise, timeoutPromise])
+            .catch(() => {
+              // 降级到首页
+              router.replace('/home');
+            });
         });
 
-        // --- Main App Component ---
-        const App = {
-            template: `
-                <div id="app">
-                    <router-view v-slot="{ Component }">
-                        <transition name="fade" mode="out-in">
-                            <component :is="Component" />
-                        </transition>
-                    </router-view>
+        return { device };
+      }
+    };
 
-                    <!-- Global Tab Bar -->
-                    <nav class="tab-bar" v-if="showTabBar">
-                        <router-link to="/home" class="tab-item">
-                            <div class="tab-icon">
-                                <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
-                            </div>
-                            <span class="tab-label">Home</span>
-                        </router-link>
-                        <router-link to="/toolbox" class="tab-item">
-                            <div class="tab-icon">
-                                <svg viewBox="0 0 24 24"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path></svg>
-                            </div>
-                            <span class="tab-label">Toolbox</span>
-                        </router-link>
-                        <router-link to="/settings" class="tab-item">
-                            <div class="tab-icon">
-                                <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
-                            </div>
-                            <span class="tab-label">Settings</span>
-                        </router-link>
-                    </nav>
+    // --- 首页 ---
+    const HomePage = {
+      template: `
+        <div class="page">
+          <div class="brand-header safe-top">
+            <div class="brand-name">VJIAPJMTK</div>
+            <div class="brand-slogan">Your financial companion</div>
+          </div>
+          <!-- 4 个图标入口 (随机选取) -->
+          <div class="icon-grid">
+            <router-link v-for="entry in topEntries" :key="entry.label" :to="entry.path" class="icon-card">
+              <div class="icon-wrapper" v-html="entry.svg"></div>
+              <span class="icon-label">{{ entry.label }}</span>
+            </router-link>
+          </div>
+          <!-- 股票列表 -->
+          <div class="stock-list">
+            <router-link v-for="stock in displayStocks" :key="stock.symbol" :to="'/stock/' + stock.symbol" class="stock-item">
+              <div class="stock-left">
+                <span class="stock-symbol">{{ stock.symbol }}</span>
+                <span class="stock-name">{{ stock.name }}</span>
+              </div>
+              <div class="stock-right">
+                <span class="stock-price">{{ stock.price.toFixed(2) }}</span>
+                <span class="stock-change" :class="stock.change >= 0 ? 'up' : 'down'">
+                  {{ stock.change >= 0 ? '+' : '' }}{{ stock.changePercent.toFixed(2) }}%
+                </span>
+              </div>
+            </router-link>
+          </div>
+        </div>
+      `,
+      setup() {
+        // 随机选取4个入口 (每次打开文件一致，用种子: 基于应用名称固定)
+        const allEntries = [
+          { label: 'Top Gainers', path: '/top-gainers', svg: `<svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5M2 12l10 5 10-5"/></svg>` },
+          { label: 'Top Losers', path: '/top-losers', svg: `<svg viewBox="0 0 24 24"><path d="M12 22L2 17l10-5 10 5-10 5z"/><path d="M2 7l10-5 10 5M2 12l10 5 10-5"/></svg>` },
+          { label: 'Most Active', path: '/most-active', svg: `<svg viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>` },
+          { label: 'Potential', path: '/potential', svg: `<svg viewBox="0 0 24 24"><path d="M12 2v20M2 12h20"/></svg>` },
+          { label: "Today's Picks", path: '/todays-picks', svg: `<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>` },
+          { label: 'Guide', path: '/guide', svg: `<svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>` },
+          { label: 'Not Recommended', path: '/not-recommended', svg: `<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M15 9l-6 6M9 9l6 6"/></svg>` },
+          { label: 'Watchlist', path: '/watchlist', svg: `<svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>` }
+        ];
+        // 随机固定选取4个（使用固定种子以确保每次打开一致）
+        const seed = 42; // 固定种子
+        const shuffled = [...allEntries].sort((a, b) => {
+          const h = (str) => str.split('').reduce((acc, c) => acc + c.charCodeAt(0), 0);
+          return (h(a.label) % 7) - (h(b.label) % 7);
+        });
+        const topEntries = shuffled.slice(0, 4);
+
+        // 展示层股票顺序打乱
+        const displayStocks = ref(shuffleArray(STOCKS));
+
+        return { topEntries, displayStocks };
+      }
+    };
+
+    // --- 股票详情 ---
+    const StockDetailPage = {
+      template: `
+        <div class="page">
+          <div class="page-header">
+            <button class="back-btn" @click="$router.back()">
+              <svg viewBox="0 0 24 24"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+            </button>
+            <span class="page-title">{{ stock.symbol }}</span>
+          </div>
+          <div class="chart-container">
+            <div class="glass-card" style="margin-bottom: 16px;">
+              <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                  <div style="font-size: 28px; font-weight: 700;">{{ stock.price.toFixed(2) }}</div>
+                  <div :style="{ color: stock.change >= 0 ? '#e85d4a' : '#2e8bc0', fontWeight: 600 }">
+                    {{ stock.change >= 0 ? '+' : '' }}{{ stock.change.toFixed(2) }} ({{ stock.changePercent.toFixed(2) }}%)
+                  </div>
                 </div>
-            `,
-            setup() {
-                const route = useRoute();
-                const showTabBar = computed(() => {
-                    // Hide tab bar on Loading and any route with meta.hideTab true
-                    return !['/loading'].includes(route.path) && !route.meta.hideTab;
-                });
-                return { showTabBar };
-            }
+                <div style="font-size: 13px; color: var(--text-secondary);">{{ stock.name }}</div>
+              </div>
+            </div>
+            <!-- 价格曲线 SVG -->
+            <div class="glass-card" style="padding: 12px;">
+              <svg :width="'100%'" height="180" :viewBox="'0 0 340 180'" preserveAspectRatio="xMidYMid meet">
+                <defs>
+                  <linearGradient id="chartGrad" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stop-color="var(--primary)" stop-opacity="0.3"/>
+                    <stop offset="100%" stop-color="var(--primary)" stop-opacity="0.02"/>
+                  </linearGradient>
+                </defs>
+                <!-- 动态折线 -->
+                <path :d="chartPath" fill="none" stroke="var(--primary)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                <path :d="areaPath" fill="url(#chartGrad)" stroke="none"/>
+                <!-- 轴标签 -->
+                <text v-for="(label, idx) in yLabels" :key="'y'+idx" :x="5" :y="label.y" fill="var(--text-tertiary)" font-size="9">{{ label.text }}</text>
+              </svg>
+            </div>
+          </div>
+        </div>
+      `,
+      setup() {
+        const route = useRoute();
+        const symbol = route.params.symbol;
+        const stock = STOCKS.find(s => s.symbol === symbol) || STOCKS[0];
+
+        // 生成最近一个月价格数据 (30天)
+        const points = [];
+        const basePrice = stock.price * 0.85;
+        const volatility = stock.price * 0.08;
+        for (let i = 0; i < 30; i++) {
+          const trend = (i / 30) * stock.price * 0.2;
+          const noise = (Math.sin(i * 0.8) * 0.5 + Math.cos(i * 0.3) * 0.3) * volatility;
+          points.push(Math.max(0.1, basePrice + trend + noise));
+        }
+        const min = Math.min(...points) * 0.95;
+        const max = Math.max(...points) * 1.05;
+        const range = max - min || 1;
+
+        // 映射到 SVG 坐标 (x: 10~330, y: 160~20)
+        const xStep = 320 / (points.length - 1);
+        const chartPoints = points.map((p, i) => {
+          const x = 10 + i * xStep;
+          const y = 160 - ((p - min) / range) * 140;
+          return { x, y };
+        });
+
+        const chartPath = computed(() => {
+          return chartPoints.map((p, i) => (i === 0 ? 'M' : 'L') + p.x.toFixed(2) + ' ' + p.y.toFixed(2)).join(' ');
+        });
+
+        const areaPath = computed(() => {
+          const line = chartPoints.map((p, i) => (i === 0 ? 'M' : 'L') + p.x.toFixed(2) + ' ' + p.y.toFixed(2)).join(' ');
+          return line + ' L ' + chartPoints[chartPoints.length-1].x.toFixed(2) + ' 160 L ' + chartPoints[0].x.toFixed(2) + ' 160 Z';
+        });
+
+        // Y轴标签 (3个)
+        const yLabels = computed(() => {
+          const labels = [];
+          for (let i = 0; i <= 2; i++) {
+            const val = min + (range / 2) * i;
+            const y = 160 - ((val - min) / range) * 140;
+            labels.push({ y, text: val.toFixed(2) });
+          }
+          return labels;
+        });
+
+        return { stock, chartPath, areaPath, yLabels };
+      }
+    };
+
+    // --- 排名子页面通用 ---
+    function createRankPage(title, count) {
+      return {
+        template: `
+          <div class="page">
+            <div class="page-header">
+              <button class="back-btn" @click="$router.back()">
+                <svg viewBox="0 0 24 24"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+              </button>
+              <span class="page-title">${title}</span>
+            </div>
+            <div class="stock-list">
+              <router-link v-for="stock in stocks" :key="stock.symbol" :to="'/stock/' + stock.symbol" class="stock-item">
+                <div class="stock-left">
+                  <span class="stock-symbol">{{ stock.symbol }}</span>
+                  <span class="stock-name">{{ stock.name }}</span>
+                </div>
+                <div class="stock-right">
+                  <span class="stock-price">{{ stock.price.toFixed(2) }}</span>
+                  <span class="stock-change" :class="stock.change >= 0 ? 'up' : 'down'">
+                    {{ stock.change >= 0 ? '+' : '' }}{{ stock.changePercent.toFixed(2) }}%
+                  </span>
+                </div>
+              </router-link>
+            </div>
+          </div>
+        `,
+        setup() {
+          const stocks = ref(randomStocks(count));
+          return { stocks };
+        }
+      };
+    }
+
+    const TopGainersPage = createRankPage('Top Gainers', 10);
+    const TopLosersPage = createRankPage('Top Losers', 5);
+    const MostActivePage = createRankPage('Most Active', 8);
+    const PotentialPage = createRankPage('Potential', 6);
+    const TodaysPicksPage = createRankPage("Today's Picks", 10);
+    const NotRecommendedPage = createRankPage('Not Recommended', 10);
+    const WatchlistPage = createRankPage('Watchlist', 10);
+
+    // --- Guide 文章页面 ---
+    const GuidePage = {
+      template: `
+        <div class="page">
+          <div class="page-header">
+            <button class="back-btn" @click="$router.back()">
+              <svg viewBox="0 0 24 24"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+            </button>
+            <span class="page-title">Guide</span>
+          </div>
+          <div class="sub-page">
+            <div class="glass-card">
+              <h2 style="font-size: 18px; margin-bottom: 12px;">{{ article.title }}</h2>
+              <p style="font-size: 15px; line-height: 1.7; color: var(--text-secondary); white-space: pre-wrap;">{{ article.content }}</p>
+            </div>
+          </div>
+        </div>
+      `,
+      setup() {
+        const article = ref(randomArticle());
+        return { article };
+      }
+    };
+
+    // --- 工具箱页面 ---
+    const ToolboxPage = {
+      template: `
+        <div class="page">
+          <div class="page-header safe-top">
+            <span class="page-title">Toolbox</span>
+          </div>
+          <div class="tool-list">
+            <router-link to="/tool/dca" class="tool-item">
+              <div class="tool-icon"><svg viewBox="0 0 24 24"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div>
+              <span class="tool-label">DCA Profit-Taking</span>
+            </router-link>
+            <router-link to="/tool/calendar" class="tool-item">
+              <div class="tool-icon"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg></div>
+              <span class="tool-label">Wealth Calendar</span>
+            </router-link>
+            <router-link to="/tool/loan" class="tool-item">
+              <div class="tool-icon"><svg viewBox="0 0 24 24"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div>
+              <span class="tool-label">Loan Calculator</span>
+            </router-link>
+            <router-link to="/tool/profit" class="tool-item">
+              <div class="tool-icon"><svg viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg></div>
+              <span class="tool-label">Profit Calculator</span>
+            </router-link>
+            <router-link to="/tool/reverse" class="tool-item">
+              <div class="tool-icon"><svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></div>
+              <span class="tool-label">Reverse Yield</span>
+            </router-link>
+            <router-link to="/tool/password" class="tool-item">
+              <div class="tool-icon"><svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div>
+              <span class="tool-label">Password Strength</span>
+            </router-link>
+            <router-link to="/tool/credit" class="tool-item">
+              <div class="tool-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg></div>
+              <span class="tool-label">Credit Memo</span>
+            </router-link>
+          </div>
+        </div>
+      `
+    };
+
+    // --- 设定页面 ---
+    const SettingsPage = {
+      template: `
+        <div class="page">
+          <div class="page-header safe-top">
+            <span class="page-title">Settings</span>
+          </div>
+          <div class="settings-group">
+            <router-link to="/version" class="settings-item">
+              <span class="label">Version</span>
+              <span class="value">1.0.0</span>
+            </router-link>
+            <router-link to="/privacy" class="settings-item">
+              <span class="label">Privacy Policy</span>
+              <span class="value">›</span>
+            </router-link>
+            <router-link to="/terms" class="settings-item">
+              <span class="label">Terms of Service</span>
+              <span class="value">›</span>
+            </router-link>
+            <router-link to="/team" class="settings-item">
+              <span class="label">About Team</span>
+              <span class="value">›</span>
+            </router-link>
+            <a href="mailto:fdsae.vaefw.vfaefw@gmail.com" class="settings-item">
+              <span class="label">Contact Us</span>
+              <span class="value">✉</span>
+            </a>
+            <router-link to="/checkin" class="settings-item">
+              <span class="label">Check-in</span>
+              <span class="value">›</span>
+            </router-link>
+            <router-link to="/feedback" class="settings-item">
+              <span class="label">Feedback</span>
+              <span class="value">›</span>
+            </router-link>
+            <router-link to="/inbox" class="settings-item">
+              <span class="label">Inbox</span>
+              <span class="value">›</span>
+            </router-link>
+          </div>
+        </div>
+      `
+    };
+
+    // --- 版本信息子页 ---
+    const VersionPage = {
+      template: `
+        <div class="page">
+          <div class="page-header">
+            <button class="back-btn" @click="$router.back()">
+              <svg viewBox="0 0 24 24"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+            </button>
+            <span class="page-title">Version</span>
+          </div>
+          <div class="sub-page">
+            <div class="glass-card text-center" style="padding: 32px;">
+              <div style="font-size: 28px; font-weight: 700; margin-bottom: 8px;">VJIAPJMTK</div>
+              <div style="font-size: 15px; color: var(--text-secondary);">Version 1.0.0 (Build 100)</div>
+              <div style="margin-top: 16px; font-size: 13px; color: var(--text-tertiary);">© 2025 VJIAPJMTK. All rights reserved.</div>
+            </div>
+          </div>
+        </div>
+      `
+    };
+
+    // --- 隐私声明 ---
+    const PrivacyPage = {
+      template: `
+        <div class="page">
+          <div class="page-header">
+            <button class="back-btn" @click="$router.back()">
+              <svg viewBox="0 0 24 24"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+            </button>
+            <span class="page-title">Privacy Policy</span>
+          </div>
+          <div class="sub-page">
+            <div class="policy-text">Last updated: January 2025
+
+VJIAPJMTK ("we", "our", or "us") is committed to protecting your privacy. This Privacy Policy explains how we collect, use, and safeguard your information when you use our mobile application.
+
+Information We Collect:
+We may collect non-personal identification information such as device type, operating system, and anonymous usage statistics to improve our services. We do not collect personal financial data unless explicitly provided by you for calculations.
+
+How We Use Information:
+The information we collect is used solely to enhance app functionality and user experience. We never sell or share your data with third parties for marketing purposes.
+
+Data Security:
+We implement appropriate security measures to protect against unauthorized access, alteration, or destruction of your information. All financial calculations are performed locally on your device.
+
+Third-Party Services:
+Our app may contain links to third-party websites. We are not responsible for their privacy practices. Please review their policies before providing any personal information.
+
+Contact Us:
+If you have questions about this Privacy Policy, please contact us at fdsae.vaefw.vfaefw@gmail.com.</div>
+          </div>
+        </div>
+      `
+    };
+
+    // --- 服务声明 ---
+    const TermsPage = {
+      template: `
+        <div class="page">
+          <div class="page-header">
+            <button class="back-btn" @click="$router.back()">
+              <svg viewBox="0 0 24 24"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+            </button>
+            <span class="page-title">Terms of Service</span>
+          </div>
+          <div class="sub-page">
+            <div class="policy-text">Last updated: January 2025
+
+Welcome to VJIAPJMTK. By using our application, you agree to the following terms and conditions.
+
+1. Use of Service:
+The app provides financial calculation tools for informational purposes only. It does not constitute financial advice. You are solely responsible for any decisions made based on the information provided.
+
+2. Accuracy of Information:
+While we strive to provide accurate data, we make no warranties regarding the completeness or reliability of any information. Market data may be delayed or simulated.
+
+3. Limitation of Liability:
+In no event shall VJIAPJMTK be liable for any direct, indirect, incidental, or consequential damages arising from the use of our app.
+
+4. Modifications:
+We reserve the right to modify these terms at any time. Continued use of the app after changes constitutes acceptance of the new terms.
+
+5. Contact:
+For questions regarding these Terms, please contact us at fdsae.vaefw.vfaefw@gmail.com.</div>
+          </div>
+        </div>
+      `
+    };
+
+    // --- 团队介绍 ---
+    const TeamPage = {
+      template: `
+        <div class="page">
+          <div class="page-header">
+            <button class="back-btn" @click="$router.back()">
+              <svg viewBox="0 0 24 24"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+            </button>
+            <span class="page-title">About Team</span>
+          </div>
+          <div class="sub-page">
+            <div class="glass-card" style="padding: 24px;">
+              <h3 style="margin-bottom: 12px;">Our Mission</h3>
+              <p style="font-size: 15px; line-height: 1.7; color: var(--text-secondary); margin-bottom: 20px;">We are a dedicated team of financial analysts and software engineers committed to simplifying investment decision-making. Our tools are designed to be intuitive, reliable, and accessible to everyone.</p>
+              <h3 style="margin-bottom: 12px;">Our Values</h3>
+              <ul style="font-size: 15px; line-height: 1.7; color: var(--text-secondary); padding-left: 20px;">
+                <li>Transparency in all calculations</li>
+                <li>Privacy-first design</li>
+                <li>Continuous improvement</li>
+                <li>User-centric innovation</li>
+              </ul>
+              <p style="margin-top: 20px; font-size: 13px; color: var(--text-tertiary);">Contact: fdsae.vaefw.vfaefw@gmail.com</p>
+            </div>
+          </div>
+        </div>
+      `
+    };
+
+    // --- 签到页面 ---
+    const CheckinPage = {
+      template: `
+        <div class="page">
+          <div class="page-header">
+            <button class="back-btn" @click="$router.back()">
+              <svg viewBox="0 0 24 24"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+            </button>
+            <span class="page-title">Check-in</span>
+          </div>
+          <div class="sub-page">
+            <div class="glass-card" style="padding: 20px;">
+              <h3 style="margin-bottom: 16px;">{{ currentMonthName }} {{ currentYear }}</h3>
+              <div class="calendar-grid">
+                <div v-for="d in 7" :key="'h'+d" class="calendar-header">{{ weekDays[d-1] }}</div>
+                <div v-for="day in daysInMonth" :key="day" class="calendar-day" :class="{ checked: checkins.includes(day) }">{{ day }}</div>
+              </div>
+              <button class="btn mt-sm" @click="handleCheckin" :disabled="checkins.includes(today)">Check-in Today</button>
+            </div>
+          </div>
+        </div>
+      `,
+      setup() {
+        const now = new Date();
+        const currentYear = now.getFullYear();
+        const currentMonth = now.getMonth();
+        const today = now.getDate();
+        const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+        const weekDays = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
+        const currentMonthName = now.toLocaleString('en', { month: 'long' });
+
+        // 本地存储签到记录 (简化: 仅本月)
+        const storageKey = 'checkins_' + currentYear + '_' + currentMonth;
+        const saved = localStorage.getItem(storageKey);
+        const checkins = ref(saved ? JSON.parse(saved) : []);
+
+        const handleCheckin = () => {
+          if (!checkins.value.includes(today)) {
+            checkins.value.push(today);
+            localStorage.setItem(storageKey, JSON.stringify(checkins.value));
+            // toast提示 (使用简单alert? 改为自定义toast)
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.textContent = 'Check-in successful!';
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 2000);
+          }
         };
 
-        // Mount App
-        const app = createApp(App);
-        app.use(router);
-        app.mount('#app');
-    </script>
+        return { currentYear, currentMonth, today, daysInMonth, weekDays, currentMonthName, checkins, handleCheckin };
+      }
+    };
+
+    // --- 反馈页面 ---
+    const FeedbackPage = {
+      template: `
+        <div class="page">
+          <div class="page-header">
+            <button class="back-btn" @click="$router.back()">
+              <svg viewBox="0 0 24 24"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+            </button>
+            <span class="page-title">Feedback</span>
+          </div>
+          <div class="feedback-form">
+            <div class="form-group">
+              <label>Title</label>
+              <input v-model="title" class="form-input" placeholder="Enter title" />
+            </div>
+            <div class="form-group">
+              <label>Content</label>
+              <textarea v-model="content" class="form-textarea" placeholder="Describe your feedback"></textarea>
+            </div>
+            <button class="btn" :disabled="!isValid" @click="sendFeedback">Send</button>
+          </div>
+        </div>
+      `,
+      setup() {
+        const title = ref('');
+        const content = ref('');
+        const router = useRouter();
+        const isValid = computed(() => title.value.trim().length > 0 && content.value.trim().length > 0);
+
+        const sendFeedback = () => {
+          if (!isValid.value) return;
+          // toast
+          const toast = document.createElement('div');
+          toast.className = 'toast';
+          toast.textContent = 'Feedback sent successfully';
+          document.body.appendChild(toast);
+          setTimeout(() => toast.remove(), 2000);
+          title.value = '';
+          content.value = '';
+          router.back();
+        };
+
+        return { title, content, isValid, sendFeedback };
+      }
+    };
+
+    // --- 站内信件 ---
+    const InboxPage = {
+      template: `
+        <div class="page">
+          <div class="page-header">
+            <button class="back-btn" @click="$router.back()">
+              <svg viewBox="0 0 24 24"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+            </button>
+            <span class="page-title">Inbox</span>
+          </div>
+          <div class="sub-page">
+            <div class="flex-col">
+              <div class="glass-card" style="cursor: pointer;" @click="openMessage(msg)" v-for="(msg, idx) in messages" :key="idx">
+                <div style="font-weight: 600;">{{ msg.title }}</div>
+                <div style="font-size: 13px; color: var(--text-secondary); margin-top: 4px;">{{ msg.preview }}</div>
+              </div>
+            </div>
+          </div>
+          <!-- 弹窗 -->
+          <div v-if="selectedMsg" class="modal-overlay" @click.self="selectedMsg = null">
+            <div class="modal-card">
+              <h3>{{ selectedMsg.title }}</h3>
+              <p>{{ selectedMsg.content }}</p>
+              <button class="btn" @click="selectedMsg = null">Close</button>
+            </div>
+          </div>
+        </div>
+      `,
+      setup() {
+        const messages = ref([
+          {
+            title: 'Welcome',
+            preview: 'Welcome to VJIAPJMTK! Start exploring...',
+            content: 'Welcome to VJIAPJMTK! We are excited to have you on board. Our app provides you with powerful financial tools and market insights to help you make informed decisions. Explore the Home page for stock updates, use the Toolbox for calculations, and customize your experience in Settings. If you have any questions, feel free to reach out to our support team. Happy investing!'
+          }
+        ]);
+        const selectedMsg = ref(null);
+
+        const openMessage = (msg) => {
+          selectedMsg.value = msg;
+        };
+
+        return { messages, selectedMsg, openMessage };
+      }
+    };
+
+    // ========== 工具子页面 ==========
+
+    // --- DCA Profit-Taking ---
+    const DcaToolPage = {
+      template: `
+        <div class="page">
+          <div class="page-header">
+            <button class="back-btn" @click="$router.back()">
+              <svg viewBox="0 0 24 24"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+            </button>
+            <span class="page-title">DCA Profit-Taking</span>
+          </div>
+          <div class="sub-page">
+            <div class="glass-card">
+              <div class="form-group">
+                <label>Cost Basis (per share)</label>
+                <input v-model.number="costBasis" type="number" class="form-input" placeholder="0.00" />
+              </div>
+              <div class="form-group">
+                <label>Shares</label>
+                <input v-model.number="shares" type="number" class="form-input" placeholder="0" />
+              </div>
+              <div class="form-group">
+                <label>Current Price</label>
+                <input v-model.number="currentPrice" type="number" class="form-input" placeholder="0.00" />
+              </div>
+              <div class="form-group">
+                <label>Take Profit Threshold (%)</label>
+                <input v-model.number="threshold" type="number" class="form-input" placeholder="20" />
+              </div>
+              <div style="margin-top: 16px; padding-top: 16px; border-top: 1px solid rgba(0,0,0,0.06);">
+                <div style="font-size: 14px; color: var(--text-secondary);">Current Profit:</div>
+                <div style="font-size: 24px; font-weight: 700;" :style="{ color: profit >= 0 ? '#e85d4a' : '#2e8bc0' }">
+                  {{ profit >= 0 ? '+' : '' }}{{ profit.toFixed(2) }}
+                </div>
+                <div style="font-size: 13px; color: var(--text-tertiary); margin-top: 4px;">
+                  {{ profitPercent.toFixed(2) }}% (Target: {{ threshold }}%)
+                </div>
+                <div v-if="profitPercent >= threshold" style="margin-top: 12px; padding: 10px; background: rgba(74,144,226,0.1); border-radius: 8px; font-size: 13px; color: var(--primary);">
+                  ✅ Target reached! Consider taking profit.
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      `,
+      setup() {
+        const costBasis = ref(100);
+        const shares = ref(50);
+        const currentPrice = ref(120);
+        const threshold = ref(20);
+
+        const profit = computed(() => (currentPrice.value - costBasis.value) * shares.value);
+        const profitPercent = computed(() => costBasis.value > 0 ? ((currentPrice.value - costBasis.value) / costBasis.value) * 100 : 0);
+
+        return { costBasis, shares, currentPrice, threshold, profit, profitPercent };
+      }
+    };
+
+    // --- Wealth Calendar (简化) ---
+    const WealthCalendarPage = {
+      template: `
+        <div class="page">
+          <div class="page-header">
+            <button class="back-btn" @click="$router.back()">
+              <svg viewBox="0 0 24 24"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+            </button>
+            <span class="page-title">Wealth Calendar</span>
+          </div>
+          <div class="sub-page">
+            <div class="glass-card">
+              <div class="form-group">
+                <label>Buy Date</label>
+                <input v-model="buyDate" type="date" class="form-input" />
+              </div>
+              <div class="form-group">
+                <label>Duration (days)</label>
+                <input v-model.number="duration" type="number" class="form-input" placeholder="30" />
+              </div>
+              <div class="form-group">
+                <label>Maturity Date</label>
+                <input :value="maturityDate" class="form-input" readonly />
+              </div>
+              <div style="font-size: 13px; color: var(--text-secondary); margin-top: 8px;">Maturity date is calculated automatically.</div>
+            </div>
+          </div>
+        </div>
+      `,
+      setup() {
+        const buyDate = ref(new Date().toISOString().slice(0, 10));
+        const duration = ref(30);
+        const maturityDate = computed(() => {
+          if (!buyDate.value) return '';
+          const d = new Date(buyDate.value);
+          d.setDate(d.getDate() + (duration.value || 0));
+          return d.toISOString().slice(0, 10);
+        });
+        return { buyDate, duration, maturityDate };
+      }
+    };
+
+    // --- Loan Calculator ---
+    const LoanCalculatorPage = {
+      template: `
+        <div class="page">
+          <div class="page-header">
+            <button class="back-btn" @click="$router.back()">
+              <svg viewBox="0 0 24 24"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+            </button>
+            <span class="page-title">Loan Calculator</span>
+          </div>
+          <div class="sub-page">
+            <div class="glass-card">
+              <div class="form-group">
+                <label>Loan Amount</label>
+                <input v-model.number="amount" type="number" class="form-input" placeholder="0.00" />
+              </div>
+              <div class="form-group">
+                <label>Annual Interest Rate (%)</label>
+                <input v-model.number="rate" type="number" step="0.01" class="form-input" placeholder="5.0" />
+              </div>
+              <div class="form-group">
+                <label>Term (months)</label>
+                <input v-model.number="months" type="number" class="form-input" placeholder="12" />
+              </div>
+              <div style="margin-top: 16px; padding-top: 16px; border-top: 1px solid rgba(0,0,0,0.06);">
+                <div style="font-size: 14px; color: var(--text-secondary);">Monthly Payment (Equal Principal & Interest):</div>
+                <div style="font-size: 24px; font-weight: 700;">{{ monthlyPayment.toFixed(2) }}</div>
+                <div style="font-size: 13px; color: var(--text-tertiary); margin-top: 4px;">Total Interest: {{ totalInterest.toFixed(2) }}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      `,
+      setup() {
+        const amount = ref(10000);
+        const rate = ref(5);
+        const months = ref(12);
+
+        const monthlyPayment = computed(() => {
+          if (!amount.value || !months.value || !rate.value) return 0;
+          const r = rate.value / 100 / 12;
+          if (r === 0) return amount.value / months.value;
+          return amount.value * r * Math.pow(1 + r, months.value) / (Math.pow(1 + r, months.value) - 1);
+        });
+        const totalInterest = computed(() => monthlyPayment.value * months.value - amount.value);
+
+        return { amount, rate, months, monthlyPayment, totalInterest };
+      }
+    };
+
+    // --- Profit Calculator ---
+    const ProfitCalculatorPage = {
+      template: `
+        <div class="page">
+          <div class="page-header">
+            <button class="back-btn" @click="$router.back()">
+              <svg viewBox="0 0 24 24"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+            </button>
+            <span class="page-title">Profit Calculator</span>
+          </div>
+          <div class="sub-page">
+            <div class="glass-card">
+              <div class="form-group">
+                <label>Unit Cost</label>
+                <input v-model.number="cost" type="number" class="form-input" placeholder="0.00" />
+              </div>
+              <div class="form-group">
+                <label>Unit Price</label>
+                <input v-model.number="price" type="number" class="form-input" placeholder="0.00" />
+              </div>
+              <div class="form-group">
+                <label>Sales Volume</label>
+                <input v-model.number="volume" type="number" class="form-input" placeholder="0" />
+              </div>
+              <div style="margin-top: 16px; padding-top: 16px; border-top: 1px solid rgba(0,0,0,0.06);">
+                <div style="font-size: 14px; color: var(--text-secondary);">Daily Profit:</div>
+                <div style="font-size: 24px; font-weight: 700;" :style="{ color: dailyProfit >= 0 ? '#e85d4a' : '#2e8bc0' }">
+                  {{ dailyProfit >= 0 ? '+' : '' }}{{ dailyProfit.toFixed(2) }}
+                </div>
+                <div style="font-size: 13px; color: var(--text-tertiary); margin-top: 4px;">Monthly Profit: {{ (dailyProfit * 30).toFixed(2) }}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      `,
+      setup() {
+        const cost = ref(10);
+        const price = ref(15);
+        const volume = ref(100);
+        const dailyProfit = computed(() => (price.value - cost.value) * volume.value);
+        return { cost, price, volume, dailyProfit };
+      }
+    };
+
+    // --- Reverse Yield ---
+    const ReverseYieldPage = {
+      template: `
+        <div class="page">
+          <div class="page-header">
+            <button class="back-btn" @click="$router.back()">
+              <svg viewBox="0 0 24 24"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+            </button>
+            <span class="page-title">Reverse Yield</span>
+          </div>
+          <div class="sub-page">
+            <div class="glass-card">
+              <div class="form-group">
+                <label>Target Return</label>
+                <input v-model.number="targetReturn" type="number" class="form-input" placeholder="0.00" />
+              </div>
+              <div class="form-group">
+                <label>Principal</label>
+                <input v-model.number="principal" type="number" class="form-input" placeholder="0.00" />
+              </div>
+              <div class="form-group">
+                <label>Investment Duration (months)</label>
+                <input v-model.number="durationMonths" type="number" class="form-input" placeholder="12" />
+              </div>
+              <div style="margin-top: 16px; padding-top: 16px; border-top: 1px solid rgba(0,0,0,0.06);">
+                <div style="font-size: 14px; color: var(--text-secondary);">Required Annualized Yield:</div>
+                <div style="font-size: 24px; font-weight: 700;">{{ annualYield.toFixed(2) }}%</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      `,
+      setup() {
+        const targetReturn = ref(1000);
+        const principal = ref(10000);
+        const durationMonths = ref(12);
+        const annualYield = computed(() => {
+          if (!principal.value || !durationMonths.value) return 0;
+          const totalReturnRate = targetReturn.value / principal.value;
+          const annualRate = totalReturnRate * (12 / durationMonths.value);
+          return annualRate * 100;
+        });
+        return { targetReturn, principal, durationMonths, annualYield };
+      }
+    };
+
+    // --- Password Strength (调用 md5) ---
+    const PasswordStrengthPage = {
+      template: `
+        <div class="page">
+          <div class="page-header">
+            <button class="back-btn" @click="$router.back()">
+              <svg viewBox="0 0 24 24"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+            </button>
+            <span class="page-title">Password Strength</span>
+          </div>
+          <div class="sub-page">
+            <div class="glass-card">
+              <div class="form-group">
+                <label>Enter Password</label>
+                <input v-model="password" type="text" class="form-input" placeholder="Type a password" />
+              </div>
+              <div class="strength-bar">
+                <div class="strength-fill" :style="{ width: strengthPercent + '%', background: strengthColor }"></div>
+              </div>
+              <div style="display: flex; justify-content: space-between; font-size: 13px; color: var(--text-secondary);">
+                <span>{{ strengthLabel }}</span>
+                <span>Score: {{ strengthScore }}/4</span>
+              </div>
+              <div style="margin-top: 16px; padding-top: 16px; border-top: 1px solid rgba(0,0,0,0.06);">
+                <div style="font-size: 13px; color: var(--text-secondary); margin-bottom: 4px;">MD5 Hash:</div>
+                <div class="text-mono" style="word-break: break-all;">{{ md5Hash }}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      `,
+      setup() {
+        const password = ref('');
+        const md5Hash = computed(() => password.value ? md5(password.value) : '—');
+
+        const strengthScore = computed(() => {
+          const p = password.value;
+          let score = 0;
+          if (p.length >= 8) score++;
+          if (/[A-Z]/.test(p)) score++;
+          if (/[0-9]/.test(p)) score++;
+          if (/[^A-Za-z0-9]/.test(p)) score++;
+          return Math.min(score, 4);
+        });
+
+        const strengthPercent = computed(() => (strengthScore.value / 4) * 100);
+        const strengthLabel = computed(() => {
+          const labels = ['Very Weak', 'Weak', 'Fair', 'Strong', 'Very Strong'];
+          return labels[strengthScore.value];
+        });
+        const strengthColor = computed(() => {
+          const colors = ['#e85d4a', '#f0a030', '#f0d030', '#8bc34a', '#4caf50'];
+          return colors[strengthScore.value];
+        });
+
+        return { password, md5Hash, strengthScore, strengthPercent, strengthLabel, strengthColor };
+      }
+    };
+
+    // --- Credit Memo ---
+    const CreditMemoPage = {
+      template: `
+        <div class="page">
+          <div class="page-header">
+            <button class="back-btn" @click="$router.back()">
+              <svg viewBox="0 0 24 24"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+            </button>
+            <span class="page-title">Credit Memo</span>
+          </div>
+          <div class="sub-page">
+            <div class="glass-card">
+              <div class="form-group">
+                <label>Debtor Name</label>
+                <input v-model="debtor" type="text" class="form-input" placeholder="Name" />
+              </div>
+              <div class="form-group">
+                <label>Amount</label>
+                <input v-model.number="amount" type="number" class="form-input" placeholder="0.00" />
+              </div>
+              <div class="form-group">
+                <label>Due Date</label>
+                <input v-model="dueDate" type="date" class="form-input" />
+              </div>
+              <button class="btn mt-sm" @click="saveMemo">Save Memo</button>
+            </div>
+            <div v-if="memos.length > 0" class="glass-card mt-sm">
+              <h4 style="margin-bottom: 12px;">Saved Memos</h4>
+              <div v-for="(m, idx) in memos" :key="idx" style="padding: 8px 0; border-bottom: 1px solid rgba(0,0,0,0.04);">
+                <div style="display: flex; justify-content: space-between;">
+                  <span style="font-weight: 600;">{{ m.debtor }}</span>
+                  <span>{{ m.amount }}</span>
+                </div>
+                <div style="font-size: 12px; color: var(--text-tertiary);">Due: {{ m.dueDate }} · {{ getDaysLeft(m.dueDate) }} days left</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      `,
+      setup() {
+        const debtor = ref('');
+        const amount = ref(0);
+        const dueDate = ref(new Date().toISOString().slice(0, 10));
+        const memos = ref(JSON.parse(localStorage.getItem('credit_memos') || '[]'));
+
+        const saveMemo = () => {
+          if (!debtor.value.trim()) return;
+          memos.value.push({ debtor: debtor.value, amount: amount.value, dueDate: dueDate.value });
+          localStorage.setItem('credit_memos', JSON.stringify(memos.value));
+          debtor.value = '';
+          amount.value = 0;
+          // toast
+          const toast = document.createElement('div');
+          toast.className = 'toast';
+          toast.textContent = 'Memo saved';
+          document.body.appendChild(toast);
+          setTimeout(() => toast.remove(), 2000);
+        };
+
+        const getDaysLeft = (dateStr) => {
+          const diff = new Date(dateStr) - new Date();
+          return Math.ceil(diff / (1000 * 60 * 60 * 24));
+        };
+
+        return { debtor, amount, dueDate, memos, saveMemo, getDaysLeft };
+      }
+    };
+
+    // ========== 路由配置 ==========
+    const routes = [
+      { path: '/', redirect: '/loading' },
+      { path: '/loading', component: LoadingPage, meta: { hideTab: true } },
+      { path: '/home', component: HomePage },
+      { path: '/stock/:symbol', component: StockDetailPage, meta: { hideTab: true } },
+      { path: '/top-gainers', component: TopGainersPage, meta: { hideTab: true } },
+      { path: '/top-losers', component: TopLosersPage, meta: { hideTab: true } },
+      { path: '/most-active', component: MostActivePage, meta: { hideTab: true } },
+      { path: '/potential', component: PotentialPage, meta: { hideTab: true } },
+      { path: '/todays-picks', component: TodaysPicksPage, meta: { hideTab: true } },
+      { path: '/guide', component: GuidePage, meta: { hideTab: true } },
+      { path: '/not-recommended', component: NotRecommendedPage, meta: { hideTab: true } },
+      { path: '/watchlist', component: WatchlistPage, meta: { hideTab: true } },
+      { path: '/toolbox', component: ToolboxPage },
+      { path: '/settings', component: SettingsPage },
+      { path: '/version', component: VersionPage, meta: { hideTab: true } },
+      { path: '/privacy', component: PrivacyPage, meta: { hideTab: true } },
+      { path: '/terms', component: TermsPage, meta: { hideTab: true } },
+      { path: '/team', component: TeamPage, meta: { hideTab: true } },
+      { path: '/checkin', component: CheckinPage, meta: { hideTab: true } },
+      { path: '/feedback', component: FeedbackPage, meta: { hideTab: true } },
+      { path: '/inbox', component: InboxPage, meta: { hideTab: true } },
+      { path: '/tool/dca', component: DcaToolPage, meta: { hideTab: true } },
+      { path: '/tool/calendar', component: WealthCalendarPage, meta: { hideTab: true } },
+      { path: '/tool/loan', component: LoanCalculatorPage, meta: { hideTab: true } },
+      { path: '/tool/profit', component: ProfitCalculatorPage, meta: { hideTab: true } },
+      { path: '/tool/reverse', component: ReverseYieldPage, meta: { hideTab: true } },
+      { path: '/tool/password', component: PasswordStrengthPage, meta: { hideTab: true } },
+      { path: '/tool/credit', component: CreditMemoPage, meta: { hideTab: true } }
+    ];
+
+    const router = createRouter({
+      history: createWebHashHistory(),
+      routes
+    });
+
+    // 根组件 App
+    const App = {
+      template: `
+        <router-view v-slot="{ Component }">
+          <transition name="fade" mode="out-in">
+            <component :is="Component" />
+          </transition>
+        </router-view>
+        <nav v-if="showTab" class="tab-bar">
+          <router-link to="/home" class="tab-item" active-class="active">
+            <span class="tab-icon"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></span>
+            <span>Home</span>
+          </router-link>
+          <router-link to="/toolbox" class="tab-item" active-class="active">
+            <span class="tab-icon"><svg viewBox="0 0 24 24"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg></span>
+            <span>Toolbox</span>
+          </router-link>
+          <router-link to="/settings" class="tab-item" active-class="active">
+            <span class="tab-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></span>
+            <span>Settings</span>
+          </router-link>
+        </nav>
+      `,
+      setup() {
+        const route = useRoute();
+        const showTab = computed(() => {
+          const hide = route.meta.hideTab;
+          return !hide;
+        });
+        return { showTab };
+      }
+    };
+
+    // 挂载
+    const app = createApp(App);
+    app.use(router);
+    app.mount('#app');
+  </script>
 </body>
 </html>
